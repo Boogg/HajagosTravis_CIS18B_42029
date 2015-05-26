@@ -18,6 +18,7 @@ public class MenuState extends GameState {
     private int currentChoice = 0;
     private String[] option = {
         "Start",
+        "Log In",
         "High Scores",
         "Options",
         "Quit"
