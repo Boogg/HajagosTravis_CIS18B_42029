@@ -1,0 +1,37 @@
+CSC 18b 42029
+Final  project 06/10/2015
+
+Personal Project
+
+Travis Hajagos 1998726
+
+List of concepts used by chapter
+
+chapter 14 - GUI
+	-swing  -  Cell_CultureV1.2\src\Cell_Culture\Menu.java
+	-AWT  -  Cell_CultureV1.2\src\Cell_Culture\Window.java
+	-Forms  -  Cell_CultureV1.2\src\Cell_Culture\Registration.java
+	-Event Handling  -  Cell_CultureV1.2\src\Cell_Culture\LogIn.java
+	
+chapter 15 - Graphics Java 2D
+	-Draw functions - Cell_CultureV1.2\src\Cell_Culture\BasicEnemy.java   lines - 50-57
+	Pretty much all the Entity objects have a draw function to draw them onto the screen
+
+chapter 16 - Regular Expressions
+	-  Cell_CultureV1.2\src\Cell_Culture\RegexCheck.java
+
+chapter 17 - file stream / serialization
+	-Buffering  -  not implimented
+	-File stream - not implimented
+	-serialization  -  not implimented
+
+chapter 26 - threads
+	-  Cell_CultureV1.2\src\Cell_Culture\Game.java   lines - 31, 89-92, 95,-102
+
+chapter 27 - Networking
+	-Sockets  -  not implimented 
+
+chapter 28 - Database
+	-SQL connections - Cell_CultureV1.2\src\Cell_Culture\DBHandler.java
+	
+
