@@ -28,17 +28,22 @@ public class Game extends Canvas implements Runnable{
     
     public static int nutrientCount, playerID;
     
-    private Thread thread;
+    public static Thread thread;
     
-    private boolean running = false;
+    private static boolean running = false;
+    
+    public static Window window;
     
     private Handler handler;
     
-    private HUD hud;
+    HUD hud;
     
     Random rand = new Random();
     
-    public Game(){     
+ //   Player player = new Player(WIDTH/2 -32, HEIGHT/2-32, ID.Player,
+  //      handler, 10, playerID, null);
+    
+    public Game(){
         
         handler = new Handler();
         
@@ -48,15 +53,12 @@ public class Game extends Canvas implements Runnable{
         
         this.addMouseMotionListener(new MouseInput(handler));
         
-        new Window(WIDTH, HEIGHT, "Cell Culture", this);
+        window = new Window(WIDTH, HEIGHT, "Cell Culture", this);
         
         requestFocus();
         
         //adds nutrients to the game board
         for(int i=0; i<1000; i++){
-                
-//                    float randWidth = rand.nextInt(4500);
-//                    float randHeight = rand.nextInt(4500);
                     handler.addObject(new Nutrient(rand.nextInt(4980),
                                       rand.nextInt(4980), ID.Nutrient, 1));
                     nutrientCount++;
@@ -65,15 +67,22 @@ public class Game extends Canvas implements Runnable{
         }
         //adds moving nutrients
         for(int i=0;i<100;i++){
-                handler.addObject(new BasicEnemy(rand.nextInt(4980), rand.nextInt(4980), ID.BasicEnemy));       
+                handler.addObject(new BasicEnemy(rand.nextInt(4980),
+                        rand.nextInt(4980), ID.BasicEnemy));       
+        }
+        
+       for(int i=0;i<100;i++){
+        handler.addObject(new StalkerEnemy(rand.nextInt(4950),
+                rand.nextInt(4950), ID.StalkerEnemy, 1f));
         }
         
         playerID = rand.nextInt(30);
         
-        handler.addObject(new Player(WIDTH/2 -32, HEIGHT/2-32, ID.Player, handler, 10, playerID, null));
+
+        handler.addObject(new Player(WIDTH/2 -32, HEIGHT/2-32, ID.Player,
+        handler, 10, playerID, null));
  
-//        System.out.println(HEIGHT);
-//        System.out.println(WIDTH);
+
        
     }
      
@@ -83,7 +92,7 @@ public class Game extends Canvas implements Runnable{
         running = true;
     }
     
-     public synchronized void stop(){
+     public static synchronized void stop(){
         try{
             thread.join();
             running = false;
@@ -115,7 +124,8 @@ public class Game extends Canvas implements Runnable{
             if(System.currentTimeMillis() - timer > 1000){
                 timer += 1000;
 //                frames = 0;
-            }     
+            }
+        //    if(player.getMass() > 0) stop();
         }
         stop();
     }
@@ -153,8 +163,6 @@ public class Game extends Canvas implements Runnable{
         
         handler.render(g);
         
-        
-        
         g.dispose();
         bs.show();
         
@@ -172,7 +180,11 @@ public class Game extends Canvas implements Runnable{
      */
     public static void main(String[] args) {
         
-        new Game();
+        Menu menu = new Menu();
+        menu.setResizable(false);
+        menu.setLocationRelativeTo(null);
+        menu.setVisible(true);
+       
         
     }
     

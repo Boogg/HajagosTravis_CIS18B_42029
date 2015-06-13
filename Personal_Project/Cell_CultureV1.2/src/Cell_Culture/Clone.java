@@ -17,10 +17,10 @@ public class Clone extends Player{
 
 
     
-    public Clone(float x, float y, ID id, Handler handler, int mass, int playerID, Color color) {
+    public Clone(float x, float y, ID id, Handler handler, float mass, int playerID, Color color, float moveSpeed) {
         super(x, y, id, handler, mass, playerID, color);
-        
-        
+        this.moveSpeed = moveSpeed;
+         
     }
     
     
@@ -37,17 +37,17 @@ public void collision(){
         tempY = (tempObject.getY()+(tempObject.getDiameter())/2)-(y+(diameter/2));
 
         if(tempObject.getId() != ID.Clone){
-            if(tempObject.getId() == ID.Player || tempObject.getId() == ID.Clone){
+            if((tempObject.getId() == ID.Player || tempObject.getId() == ID.Clone) && tempObject.playerID == playerID){
                 tempMinDistance = (diameter)/2 + (tempObject.getDiameter())/2;
             }else{
                 tempMinDistance = (diameter)/2;
             }
             if((tempX*tempX + tempY*tempY) < (tempMinDistance * tempMinDistance)){
-                if(tempObject.getId() != ID.Player || tempObject.getId() != ID.Clone){
+                if(tempObject.getId() != ID.Player && tempObject.getId() != ID.Clone){
                     mass+=tempObject.getMass();
-                    if(tempObject.getId() == ID.Nutrient){
-                    Game.nutrientCount--;
-                    }
+//                    if(tempObject.getId() == ID.Nutrient){
+//                    Game.nutrientCount--;
+////                    }
                     handler.object.remove(tempObject);
                 }else if(tempObject.getId() == ID.Player || tempObject.getId() == ID.Clone){
                     
@@ -68,7 +68,11 @@ public void collision(){
         velX=0;
         velY=0;
         
-        diameter=mass+30; 
+        if(diameter < 300){
+            diameter = mass+30;
+        }else{
+            diameter = 300;
+        }
         
         //claculate speed relative to mass
 
@@ -108,7 +112,8 @@ public void render(Graphics g){
     g.setColor(Color.black);
     g.drawOval((int)x, (int)y, (int)diameter, (int)diameter);
     g.setFont(stringFont);
-    g.drawString(String.valueOf((int)mass), (int)(x+diameter/2-10), (int)(y+diameter/2+7));
+    g.drawString(String.valueOf((int)mass), (int)(x+diameter/2-10),
+            (int)(y+diameter/2+7));
 }
     
 }

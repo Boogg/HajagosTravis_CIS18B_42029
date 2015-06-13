@@ -38,22 +38,22 @@ public class KeyInput extends KeyAdapter{
             for(int i=0;i<handler.object.size();i++){
                 GameObject tempObject = handler.object.get(i);
 
-                if(tempObject.getId() == ID.Player){
+                if(tempObject.getId() == ID.Player || tempObject.getId() == ID.Clone){
                 //    key Events
 
                     if(tempObject.getMass() > 40 && spacePressed == false){
                         tempObject.setMass(tempObject.mass/2);
 
 
-                        float xDelt= (float) (Math.tan(tempObject.direction)+tempObject.getDiameter() ),
-                              yDelt= (float) (Math.tan(tempObject.direction)+tempObject.getDiameter() );
+                        float xDelt= 2.0f + (float)(Math.cos(tempObject.direction)*tempObject.getDiameter() ),
+                              yDelt= 2.0f + (float)(Math.sin(tempObject.direction)*tempObject.getDiameter() );
                         System.out.println(xDelt);
                         System.out.println((int)(tempObject.getX()+xDelt));
-                        handler.addObject(new Player(
+                        handler.addObject(new Clone(
                                 (int)(tempObject.getX()+xDelt), 
                                 (int)(tempObject.getY()+yDelt), 
-                                ID.Player, handler, tempObject.getMass(), 
-                                tempObject.playerID, tempObject.color));
+                                ID.Clone, handler, tempObject.getMass(), 
+                                tempObject.playerID, tempObject.color, 15f));
                     }
                 }
             }
@@ -80,6 +80,8 @@ public class KeyInput extends KeyAdapter{
 //        }
     }
     
-    
+    public void spacePressed(){
+        
+    }
     
 }

@@ -13,6 +13,7 @@ public enum ID {
     Player(),
     BasicEnemy(),
     Nutrient(),
-    Clone();
+    Clone(),
+    StalkerEnemy();
     
 }

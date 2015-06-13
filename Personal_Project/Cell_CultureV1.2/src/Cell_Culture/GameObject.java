@@ -15,8 +15,8 @@ import java.util.Random;
  */
 public abstract class GameObject {
     
-    protected int mouseX, mouseY, mass, playerID;
-    protected float x, y, velX, velY, diameter, deltaX, deltaY,
+    protected int mouseX, mouseY, playerID;
+    protected float x, y, velX, velY, diameter, mass, deltaX, deltaY,
             tempX, tempY, boardSize, direction;
     
     protected ID id;
@@ -99,10 +99,10 @@ public abstract class GameObject {
         this.deltaY = y;
     }
     
-    public void setMass(int mass){
+    public void setMass(float mass){
         this.mass = mass;
     }
-    public int getMass(){
+    public float getMass(){
         return mass;
     }
     

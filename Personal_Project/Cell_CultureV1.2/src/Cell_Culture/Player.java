@@ -10,6 +10,7 @@ import static Cell_Culture.Game.nutrientCount;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.image.BufferStrategy;
 import java.util.Random;
 
 /**
@@ -23,24 +24,29 @@ public class Player extends GameObject{
     Handler handler; 
     
     Font stringFont = new Font( "SansSerif", Font.PLAIN, 18 );
-    
+    Font looseFont = new Font( "SansSerif", Font.PLAIN, 72 );
     public float initialSpeed=7, moveSpeed=initialSpeed, delX, delY,
              orginX, orginY, boardSize, factor;
     
-    boolean eat;
+    boolean eat, lost;
     
-    public Player(float x, float y, ID id, Handler handler, int mass, int playerID,  Color color){
+    public Graphics g;
+    float maxMass = 0;
+    
+    public Player(float x, float y, ID id, Handler handler, float mass, int playerID,  Color color){
         super(x, y, id);
         this.handler = handler;
         this.playerID=playerID;
         this.mass = mass;
         if(color != null)this.color=color;
-        this.alpha=false;
+        this.alpha=true;
         this.orginX = x;
         this.orginY = y;
         factor=1f;
         tempX = rand.nextInt(4970);
         tempY = rand.nextInt(4970);
+        
+        this.lost = false;
         
         //check to see if this player already exists on the board
         int foundPlayer = 0;
@@ -58,6 +64,7 @@ public class Player extends GameObject{
                 }
             }
         }
+        
         //if this is the first player with this id then set them in on the board
         if(foundPlayer <= 1){
             
@@ -80,7 +87,9 @@ public class Player extends GameObject{
     }
 
     public void tick(){
-        
+        if(mass > maxMass){
+            maxMass = mass;
+        }
         //reset velocities to zero every tick
         velX=0;
         velY=0;
@@ -97,11 +106,11 @@ public class Player extends GameObject{
         //claculate the angle between player and curser in radians
         direction = (float)Math.atan2(delY,delX);
 
-       //if the curser is farther than 3 pixles away, move 
-        if(delX>3 || delX<-3){
+       //if the curser is farther than 1/4 the diameter away, move 
+        if(delX>diameter/4 || delX<-diameter/4){
             velX = (float)(moveSpeed * Math.cos(direction));
         }
-        if(delY>3 || delY<-3){
+        if(delY>diameter/4 || delY<-diameter/4){
             velY = (float)(moveSpeed * Math.sin(direction));
         }
 
@@ -109,13 +118,15 @@ public class Player extends GameObject{
 //        for(int i=0; i< handler.object.size(); i++){
 //            
 //            GameObject tempObject = handler.object.get(i);
-//            
-//            if(tempObject.getId() == ID.Player){
+//           if(tempObject.getId() == ID.Player){
 //                if(tempObject.playerID == playerID && tempObject.mass > mass){
+//                    if(tempObject.alpha){
 //                    alpha = false;
+//                    }
 //                }else alpha = true;
 //            }
-//        }
+//        } 
+            
             
         
         //keeps the player in the center of the screen as it grows
@@ -134,7 +145,7 @@ public class Player extends GameObject{
         for(int i=0; i< handler.object.size(); i++){
             
             GameObject tempObject = handler.object.get(i);
-   //         if(tempObject.getId() != ID.Player){
+            if(tempObject.getId() != ID.Player){
                 if(tempX > 0 && tempX < boardSize){
                     tempObject.setDeltaX(-velX);
                 }else{
@@ -145,7 +156,7 @@ public class Player extends GameObject{
                 }else{
                     tempObject.setDeltaY(0);
                 }
-         //   }
+            }
         }
 //        }else{
 //        //keeps track of where the player is on the game board
@@ -163,9 +174,43 @@ public class Player extends GameObject{
         
         collision();    
         
+        
 
         diameter = diameterClamp(mass+30);
-        
+        if(mass>30){
+            int temp = (int)mass;
+            mass -= mass/50000;
+            if(mass > 300 && (temp - (int)mass) == 1){
+                boardSize += 0.02f;
+                factor = boardSize/5000;                
+                for(int j=0; j< handler.object.size(); j++){
+                    GameObject tempObject2 = handler.object.get(j);
+                    if(tempObject2.getId() != ID.Player){
+                        tempObject2.x += 0.01f;
+                        tempObject2.y += 0.01f;
+                        tempObject2.diameter = 23 * factor;
+                    }
+                }
+
+            }
+
+            
+        }
+       
+         if(mass <= 0){
+            lost = true;
+//            long time1 = System.currentTimeMillis();
+//            long time2 = time1;
+//            while((time2 - time1)< 3000){
+//                time2 = System.currentTimeMillis();
+//            }
+//            Menu menu = new Menu();
+//            menu.setResizable(false);
+//            menu.setLocationRelativeTo(null);        
+//            menu.setVisible(true);
+//            Game.window.close();
+//            Game.stop();
+         }
 
 
         
@@ -184,49 +229,57 @@ public class Player extends GameObject{
             temY = (tempObject.getY()+(tempObject.getDiameter())/2)-(y+(diameter/2));
             
             if(tempObject.getId() != ID.Player){
-
+                                   
                 if(tempObject.getId() == ID.Clone){
                     tempMinDistance = (diameter)/2 + (tempObject.getDiameter())/2;
                 }else{
                     tempMinDistance = (diameter)/2;
                 }
                 if((temX*temX + temY*temY) < (tempMinDistance * tempMinDistance)){
-//                    if(tempObject.getId() != ID.Clone){
+                    if(tempObject.getId() != ID.StalkerEnemy){
                         mass+=tempObject.getMass();
 //                        if(tempObject.getId() == ID.Nutrient){
 //                        nutrientCount--;
-//                        }
+                    }else{
+                        mass-=tempObject.getMass();
+                        float randWidth=rand.nextInt((int)(boardSize));
+                        float randHeight=rand.nextInt((int)(boardSize));
+                        handler.addObject(new StalkerEnemy(randWidth-tempX+x,
+                                      randHeight-tempY+y, ID.StalkerEnemy, (float)factor));
+                    }
                             eat = true;
-                            handler.object.remove(tempObject);   
-                            
-//                    }else if(tempObject.getId() == ID.Clone){
-//                            tempObject.setVelX(0);
-//                            tempObject.setVelY(0);
+                            handler.object.remove(tempObject);
+
+                    }else if(tempObject.getId() == ID.Clone && tempObject.playerID == playerID){
+                            tempObject.setVelX(0);
+                            tempObject.setVelY(0);
 //                    }
-                       
-                }          
+
+                }
             }
             if(eat){
-                if(diameter >= 300 && diameter%3 == 0){
-                    factor *= 0.9995;
+                if(diameter >= 300 && mass%3 == 0){
+                    boardSize -= 0.02f;   
+                    factor = boardSize/5000;                    
                     for(int j=0; j< handler.object.size(); j++){
                         GameObject tempObject2 = handler.object.get(j);
                         if(tempObject2.getId() != ID.Player){
-                            tempObject2.x *= 0.9995f;
-                            tempObject2.y *= 0.9995f;
-                            tempObject2.diameter *= 0.9995f;
+                            tempObject2.x -= 0.01f;
+                            tempObject2.y -= 0.01f;
+                            tempObject2.diameter = 23 * factor;
                         }
                     }
+
                 }
-                boardSize *= 0.9995f;
+                
                 float randWidth=rand.nextInt((int)(boardSize));
                 float randHeight=rand.nextInt((int)(boardSize));
 //                randWidth = Game.clamp(randWidth, 0,boardSize);
 //                randHeight = Game.clamp(randWidth, 0,boardSize);
                
-                handler.addObject(new Nutrient(randWidth-tempX-x-diameter,
-                                      randHeight-tempX-y-diameter, ID.Nutrient, factor));
-                nutrientCount++;
+                handler.addObject(new Nutrient(randWidth-tempX+x,
+                                      randHeight-tempY+y, ID.Nutrient, factor));
+       //         nutrientCount++;
                 eat = false;
             }
         }
@@ -234,15 +287,49 @@ public class Player extends GameObject{
     
     @Override
     public void render(Graphics g){
+        this.g = g;
         if(id == ID.Player) g.setColor(color);
         g.fillOval((int)x, (int)y, (int)diameter, (int)diameter);
         g.setColor(Color.black);
         g.drawOval((int)x, (int)y, (int)diameter, (int)diameter);
+        g.setColor(Color.black);
         g.setFont(stringFont);
-        g.drawString(String.valueOf((int)mass), (int)(x+diameter/2-10), (int)(y+diameter/2+7));
+        if(User.getUserID() == -1){
+            g.drawString(String.valueOf((int)mass), (int)(x+diameter/2-9), (int)(y+diameter/2+8));
+            g.setColor(Color.white);
+            g.drawString(String.valueOf((int)mass), (int)(x+diameter/2-10), (int)(y+diameter/2+7));
+        }else{
+            g.drawString(String.valueOf((int)mass), (int)(x+diameter/2-9), (int)(y+diameter/2+14));
+            g.drawString(User.getUserName(), (int)(x+diameter/2-29), (int)(y+diameter/2-6));
+            g.setColor(Color.white);
+            g.drawString(String.valueOf((int)mass), (int)(x+diameter/2-10), (int)(y+diameter/2+15));
+            g.drawString(User.getUserName(), (int)(x+diameter/2-30), (int)(y+diameter/2-7));
+        }
+        if(lost){   
+            g.setColor(Color.white);
+            g.setFont(looseFont);
+            g.drawString("You Loose", Window.HEIGHT/2-10, Window.WIDTH/2-100);
+            long time1 = System.currentTimeMillis();
+            long time2 = time1;
+            while((time2 - time1)< 3000){
+                time2 = System.currentTimeMillis();
+            }
+            Menu menu = new Menu();
+            menu.setResizable(false);
+            menu.setLocationRelativeTo(null);
+            menu.setVisible(true);
+            Game.window.close();
+            Game.stop();
+            
+        }
+        
+        g.setColor(Color.white);
+        //test displays
+//        g.drawString("X: "+String.valueOf(tempX), 10, 15);
+//        g.drawString("Y: "+String.valueOf(tempY), 10, 30);
+//        g.drawString("Direction: "+String.valueOf(direction), 10, 45);
+        g.drawString("Score: "+String.valueOf((int)maxMass), 10, 60);
+        
     }
     
-
-
-
 }

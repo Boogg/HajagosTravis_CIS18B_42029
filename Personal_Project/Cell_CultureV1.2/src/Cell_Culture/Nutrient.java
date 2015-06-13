@@ -5,6 +5,7 @@
  */
 package Cell_Culture;
 
+import java.awt.Color;
 import java.awt.Graphics;
 
 
@@ -21,7 +22,7 @@ public class Nutrient extends GameObject{
         super(x, y, id);
         
         diameter = 23 * factor;
-        mass=1;
+        mass = 1;
         
     }
     
@@ -38,6 +39,10 @@ public class Nutrient extends GameObject{
         if(y>= -23 && y<=Game.HEIGHT && x>= -23 && x<=Game.WIDTH){
           g.setColor(color);
           g.fillOval((int)x, (int)y, (int)diameter, (int)diameter);
+          g.setColor(Color.black);
+          g.drawString("+" + String.valueOf((int)mass), (int)(x+diameter/2-7), (int)(y+diameter/2+8));
+          g.setColor(Color.white);
+          g.drawString("+" + String.valueOf((int)mass), (int)(x+diameter/2-8), (int)(y+diameter/2+7));
         }
     }
     
